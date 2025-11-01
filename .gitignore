@@ -30,3 +30,56 @@
 *.exe
 *.out
 *.app
+
+# CMake build directories
+build/
+cmake-build-*/
+out/
+
+# CLion IDE files
+.idea/
+cmake-build-*/
+
+# Visual Studio files
+.vs/
+*.vcxproj*
+*.sln
+
+# Code::Blocks files
+*.cbp
+*.layout
+*.depend
+
+# Qt Creator files
+CMakeLists.txt.user*
+
+# Conan
+conandata.yml
+conanfile.txt
+conan.lock
+
+# Temporary files
+*~
+*.swp
+*.swo
+*.tmp
+
+# OS specific files
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+
+# Logs
+*.log
+
+# Testing
+Testing/

@@ -20,8 +20,6 @@ add_executable(laying_grass_Project src/main.cpp
         include/models/Position.h
         src/controllers/Game.cpp
         include/controllers/Game.h
-        src/views/Renderer.cpp
-        include/views/Renderer.h
         src/utils/SquareCalculator.cpp
         include/utils/SquareCalculator.h
         src/utils/InputValidator.cpp
@@ -30,4 +28,8 @@ add_executable(laying_grass_Project src/main.cpp
         include/utils/Random.h
         tests/test_tile.cpp
         tests/test_board.cpp
-        tests/test_square_calculator.cpp)
+        tests/test_square_calculator.cpp
+        src/views/UI_Cli.cpp
+        include/views/UI_Cli.h
+        src/views/UI_Qt.cpp
+        include/views/UI_Qt.h)

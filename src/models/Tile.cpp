@@ -5,7 +5,10 @@
 #include "../../include/models/Tile.h"
 
 namespace Models {
-    Tile::Tile(int id, std::vector<std::vector<Cell>>& pattern) : id(id), pattern(pattern) {}
+    Tile::Tile(int id, std::vector<std::vector<Cell>>& pattern) : id(id), pattern(pattern) {
+        this->height = pattern.size();
+        this->width = pattern.empty() ? 0 : pattern[0].size();
+    }
 
     int const Tile::getSize() {
         for (const auto& row : pattern) {
@@ -37,5 +40,14 @@ namespace Models {
 
         return Tile(id, pattern);
         }
+
+    Tile Tile::createTile(int id) {
+        std::ifstream file("Tiles.json");
+        nlohmann::json data = nlohmann::json::parse(file);
+
+        nlohmann::json tile = data["tiles"][id];
+        return convertJsonToTile(tile);
+    }
+
 
 } // Models

@@ -12,13 +12,13 @@ namespace Models {
     class Board {
     private:
         std::vector<std::vector<Cell>> grid;
-        std::vector<Position> position;
         int width;
         int height;
+        int playersNumber;
 
 
     public:
-        Board();
+        Board(int playersNumber);
 
         int  const getWidth(){ return width; }
         void setWidth(int w){ width = w; }
@@ -26,16 +26,19 @@ namespace Models {
         int const getHeight(){ return height; }
         void setHeight(int h){ height = h; }
 
+        std::vector<std::vector<Cell>> const getGrid(){ return grid; }
+        void setGrid(std::vector<std::vector<Cell>> g){ grid = g; }
+
         bool const isTouchingOther();
+        bool const isTouchingBonus();
+
+        bool const isTouchingWall();
+
         void placeBonus();
 
         bool const canPlaceTile();
-        void placeTile();
-
-        void placeBonusSquares();
-        void placeBonusSquare(Position p);
-
+        void placeTile(Position p);
     };
-} // Models
+}// Models
 
 #endif //LAYING_GRASS_PROJECT_BOARD_H

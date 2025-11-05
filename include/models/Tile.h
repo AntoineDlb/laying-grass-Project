@@ -20,9 +20,8 @@ namespace Models {
         int width;
         int height;
         int size = 0;
-        bool placed;
+        bool placed = false;
     public:
-        Tile();
         Tile(int id, std::vector<std::vector<Cell>>& pattern);
 
         int const getId(){ return id; }
@@ -40,7 +39,7 @@ namespace Models {
         bool isPlaced(){ return placed; }
 
         static Tile convertJsonToTile(const nlohmann::json& j);
-
+        static Tile createTile(int id);
         std::vector<std::vector<Cell>> getPattern(){return pattern;};
 
 

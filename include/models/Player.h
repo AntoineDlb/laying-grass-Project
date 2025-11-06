@@ -35,10 +35,9 @@ namespace Models {
         const std::string &getColor() const noexcept { return color; }
         void setColor(const std::string &newColor) { color = newColor; }
 
-        int calculateScore(const Board& board) const;
-        int calculateCellsPlaced(const Board& board) const;
 
-        //destruvter !!!!
+
+        //destructer !!!!
     };
 } // Models
 #endif //LAYING_GRASS_PROJECT_PLAYER_H

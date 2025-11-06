@@ -11,13 +11,5 @@ namespace Models {
         id = newId;
     }
 
-    int Player::calculateScore() {
-        return score;
-    }
-
-    int Player::calculateCellsPlaced() {
-
-        return 0;
-    }
 
 } // Models

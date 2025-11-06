@@ -1,0 +1,29 @@
+name: build C++ project
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y cmake g++
+
+      - name: Install CMake 4.0
+        run: |
+          wget https://github.com/Kitware/CMake/releases/download/v4.0.0/cmake-4.0.0-linux-x86_64.sh
+          sudo mkdir /opt/cmake
+          sudo sh cmake-4.0.0-linux-x86_64.sh --prefix=/opt/cmake --skip-license
+          sudo ln -s /opt/cmake/bin/cmake /usr/local/bin/cmake
+
+      - name: Verify CMake version
+        run: cmake --version
+
+      - name: Configure project
+        run: cmake -B build -S .
+
+      - name: Build project
+        run: cmake --build build --config Debug
+

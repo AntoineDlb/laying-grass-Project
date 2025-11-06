@@ -21,6 +21,7 @@ namespace Models {
         int height;
         int size = 0;
         bool placed = false;
+        int playerId = -1;
     public:
         Tile(int id, std::vector<std::vector<Cell>>& pattern);
 
@@ -35,8 +36,11 @@ namespace Models {
 
         int const getSize();
 
-
         bool isPlaced(){ return placed; }
+        void setPlaced(bool p){ placed = p; }
+
+        int const getPlayerId(){ return playerId; }
+        void setPlayerId(int id){ playerId = id; }
 
         static Tile convertJsonToTile(const nlohmann::json& j);
         static Tile createTile(int id);

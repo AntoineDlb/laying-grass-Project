@@ -6,7 +6,7 @@
 
 namespace Models {
     enum class State {EMPTY, GRASS, BONUS};
-    enum class BonusType {EXCHANGE, STONE, STEAL};
+    enum class BonusType {NONE, EXCHANGE, STONE, STEAL};
 }
 
 #endif //LAYING_GRASS_PROJECT_TYPES_H

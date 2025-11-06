@@ -10,19 +10,20 @@ void testJson();
 
 int main() {
 
-    displayTile();
+    displayBoard();
 
     return 0;
 }
 
 void displayBoard() {
-    Models::Board board(2);
+    Models::Board board(9);
     int width = board.getWidth();
     int height = board.getHeight();
 
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
-            switch (board.getGrid()[y][x].getState()) {
+            Models::Cell cell = board.getGrid()[y][x];
+            switch (cell.getState()) {
                 case Models::State::EMPTY:
                     std::cout << " . ";
                     break;
@@ -30,7 +31,20 @@ void displayBoard() {
                     std::cout << " # ";
                     break;
                 case Models::State::BONUS:
-                    std::cout << " B ";
+                    switch (cell.getBonusType()) {
+                        case Models::BonusType::EXCHANGE:
+                            std::cout << " E ";
+                            break;
+                        case Models::BonusType::STONE:
+                            std::cout << " S ";
+                            break;
+                        case Models::BonusType::STEAL:
+                            std::cout << " V ";
+                            break;
+                        default:
+                            std::cout << " B ";
+                            break;
+                    }
                     break;
             }
         }

@@ -36,13 +36,19 @@ namespace Models {
         std::vector<std::vector<Cell>> const getGrid(){ return grid; }
         void setGrid(std::vector<std::vector<Cell>> g){ grid = g; }
 
-        Cell* getCell(Position& pos);
+        Cell* getCell(Position& pos) {
+            if (!isInsideBoard(pos)) {
+                return nullptr;
+            }
+            return &grid[pos.getY()][pos.getX()];
+        };
 
         void placeBonus();
 
         bool isCellTouchingSomething(Position& pos, State state, int playerId);
         bool isTileTouchingGrass(Tile* tile, Position& pos, int playerId);
         bool isTouchingWall(Position& pos);
+        bool isInsideBoard(Position& pos);
 
         bool canPlaceTile(Tile* tile, Position& pos, int playerId); // à placer dans game
         void placeTile(Tile* tile, Position& pos, int playerId); // a placer dans game

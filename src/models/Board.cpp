@@ -113,6 +113,13 @@ namespace Models {
         return (x == 0 || x == width - 1 || y == 0 || y == height - 1);
     }
 
+    bool Board::isInsideBoard(Position& pos){
+        int x = pos.getX();
+        int y = pos.getY();
+        return (x >= 0 && x < width && y >= 0 && y < height);
+
+    }
+
     bool Board::canPlaceTile(Tile* tile, Position& pos, int playerId) {
         const auto& pattern = tile->getPattern();
         int tileHeight = tile->getHeight();

@@ -5,4 +5,7 @@
 #include "../../include/utils/SquareCalculator.h"
 
 namespace Utils {
+
+
+
 } // Utils

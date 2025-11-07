@@ -7,7 +7,6 @@
 #include <string>
 
 namespace Models {
-    class Board;
     class Player {
     private :
         int id;

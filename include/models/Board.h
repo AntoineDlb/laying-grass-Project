@@ -23,8 +23,6 @@ namespace Models {
         int stealCount;
 
     public:
-
-
         Board(int playersNumber);
 
         int  const getWidth(){ return width; }

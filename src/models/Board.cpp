@@ -134,6 +134,10 @@ namespace Models {
                     int boardY = pos.getY() + ty;
                     Position cellPos(boardX, boardY);
 
+                    if (!isInsideBoard(cellPos)) {
+                        return false;
+                    }
+
                     if (isTouchingWall(cellPos)) {
                         return false;
                     }
@@ -142,24 +146,31 @@ namespace Models {
                         return false;
                     }
 
-                    if (isTouchingWall(cellPos)) {
-                        return false;
-                    }
-
-                    if (isCellTouchingSomething(cellPos , State::BONUS)) {
-                        return false;
-                    }
-
-                    if (isCellTouchingSomething(cellPos,State::GRASS, !playerId)) {
+                    if (isCellTouchingSomething(cellPos , State::BONUS, -1)) {
                         return false;
                     }
 
                     if (isCellTouchingSomething(cellPos, State::GRASS, playerId)) {
-                        touchingOwnGrass = true;
+                        return false;
+                    }
+
+                    int directions[4][2] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
+                    for (auto& dir : directions) {
+                        int checkX = boardX + dir[0];
+                        int checkY = boardY + dir[1];
+
+                        if (checkX >= 0 && checkX < width && checkY >= 0 && checkY < height) {
+                            if (grid[checkY][checkX].getState() == State::GRASS &&
+                                grid[checkY][checkX].getPlayerId() == playerId) {
+                                touchingOwnGrass = true;
+                                break;
+                            }
+                        }
                     }
                 }
             }
         }
+
         bool isFirstPlacement = true;
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {

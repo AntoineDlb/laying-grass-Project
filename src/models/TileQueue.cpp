@@ -3,6 +3,8 @@
 //
 
 #include "../../include/models/TileQueue.h"
+#include <iostream>
+#include <stdexcept>
 
 namespace Models {
     TileQueue::TileQueue() {
@@ -16,7 +18,10 @@ namespace Models {
                 Tile t = Tile::createTile(tileId);
                 addTile(t);
                 tileId++;
-            } catch (std::out_of_range& e) {
+            } catch (const std::out_of_range& e) {
+                break;
+            } catch (const std::runtime_error& e) {
+                std::cerr << "Error loading tiles: " << e.what() << std::endl;
                 break;
             }
 
@@ -27,9 +32,6 @@ namespace Models {
         tiles.push_back(t);
     }
 
-    void TileQueue::addMarketTile(Tile t) {
-        market.push_back(t);
-    }
 
     void TileQueue::addUsedTile(Tile t) {
         usedTiles.push_back(t);
@@ -44,14 +46,6 @@ namespace Models {
         }
     }
 
-    void TileQueue::removeMarketTile(Tile t) {
-        for (size_t i = 0; i < market.size(); ++i) {
-            if (market[i].getId() == t.getId()) {
-                market.erase(market.begin() + i);
-                break;
-                }
-            }
-        }
 
     void TileQueue::removeUsedTile(Tile t) {
         for (auto it = usedTiles.begin(); it != usedTiles.end(); ++it) {

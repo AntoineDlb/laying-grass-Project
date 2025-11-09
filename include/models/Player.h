@@ -23,7 +23,7 @@ namespace Models {
         int getId() const noexcept { return id; }
         void setId(int newId) noexcept { id = newId; }
 
-        const std::string &getName() const noexcept { return name; }
+        const std::string getName() const noexcept { return name; }
         void setName(const std::string &newName) { name = newName; }
 
         int getScore() const noexcept { return score; }

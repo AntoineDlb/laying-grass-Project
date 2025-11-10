@@ -3,6 +3,7 @@
 //
 
 #include "../../include/models/Tile.h"
+#include <stdexcept>
 
 namespace Models {
     Tile::Tile(int id, std::vector<std::vector<Cell>>& pattern) : id(id), pattern(pattern) {
@@ -43,11 +44,41 @@ namespace Models {
 
     Tile Tile::createTile(int id) {
         std::ifstream file("Tiles.json");
-        nlohmann::json data = nlohmann::json::parse(file);
+        if (!file.is_open()) {
+            throw std::runtime_error("Cannot open Tiles.json file");
+        }
 
-        nlohmann::json tile = data["tiles"][id];
-        return convertJsonToTile(tile);
+        nlohmann::json data = nlohmann::json::parse(file);
+        file.close();
+
+        if (data.is_null() || !data.contains("tiles")) {
+            throw std::runtime_error("Invalid JSON format: missing 'tiles' key");
+        }
+
+        for (const auto& tileJson : data["tiles"]) {
+            if (tileJson["id"] == id) {
+                return convertJsonToTile(tileJson);
+            }
+        }
+
+        throw std::out_of_range("Tile with id " + std::to_string(id) + " not found");
     }
 
+    void Tile::rotate() {
+        int oldHeight = height;
+        int oldWidth = width;
+
+        std::vector<std::vector<Cell>> rotatedPattern(oldWidth, std::vector<Cell>(oldHeight));
+
+        for (int y = 0; y < oldHeight; ++y) {
+            for (int x = 0; x < oldWidth; ++x) {
+                rotatedPattern[x][oldHeight - 1 - y] = pattern[y][x];
+            }
+        }
+
+        pattern = rotatedPattern;
+        width = oldHeight;
+        height = oldWidth;
+    }
 
 } // Models

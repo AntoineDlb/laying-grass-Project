@@ -13,7 +13,7 @@ namespace Models {
         int id;
         std::string name;
         int score=0;
-        int exchange = 0;
+        int exchange = 1;
         std::string color;
 
 
@@ -37,7 +37,7 @@ namespace Models {
 
 
 
-        //destructer !!!!
+        //destructeur !!!!
     };
 } // Models
 #endif //LAYING_GRASS_PROJECT_PLAYER_H

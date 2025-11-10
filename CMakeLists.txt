@@ -3,6 +3,10 @@ project(laying_grass_Project)
 
 set(CMAKE_CXX_STANDARD 20)
 
+if(MINGW)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++ -static")
+endif()
+
 include(FetchContent)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
 FetchContent_MakeAvailable(json)
@@ -16,9 +20,11 @@ set(COMMON_SOURCES
         src/models/BonusSquare.cpp
         src/models/Position.cpp
         src/controllers/Game.cpp
+        src/controllers/TilePlacer.cpp
         src/utils/SquareCalculator.cpp
         src/utils/InputValidator.cpp
         src/utils/Random.cpp
+        src/utils/KeyboardInput.cpp
         src/views/UI_Cli.cpp
         src/views/UI_Qt.cpp
 )

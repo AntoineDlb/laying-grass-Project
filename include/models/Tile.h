@@ -46,16 +46,8 @@ namespace Models {
         static Tile createTile(int id);
         std::vector<std::vector<Cell>> getPattern(){return pattern;};
 
-
-
-
-
-
-
-
-
-
-
+        void rotate();
+        void setPattern(std::vector<std::vector<Cell>> p) { pattern = p; }
     };
 } // Models
 

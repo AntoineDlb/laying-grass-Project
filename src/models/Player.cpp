@@ -7,8 +7,12 @@
 #include <vector>
 
 namespace Models {
-    Player::Player(int newId, std::string name, std::string color) {
+    Player::Player(int newId, std::string newName, std::string newColor) {
         id = newId;
+        name = newName;
+        color = newColor;
+        exchange = 1;
+        score = 0;
     }
 
 

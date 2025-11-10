@@ -4,6 +4,7 @@
 
 #include "../../include/models/Tile.h"
 #include <stdexcept>
+#include <algorithm>
 
 namespace Models {
     Tile::Tile(int id, std::vector<std::vector<Cell>>& pattern) : id(id), pattern(pattern) {
@@ -79,6 +80,12 @@ namespace Models {
         pattern = rotatedPattern;
         width = oldHeight;
         height = oldWidth;
+    }
+
+    void Tile::flipHorizontal() {
+        for (int y = 0; y < height; ++y) {
+            std::reverse(pattern[y].begin(), pattern[y].end());
+        }
     }
 
 } // Models

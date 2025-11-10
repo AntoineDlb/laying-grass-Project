@@ -138,15 +138,7 @@ namespace Models {
                         return false;
                     }
 
-                    if (isTouchingWall(cellPos)) {
-                        return false;
-                    }
-
                     if (grid[boardY][boardX].getState() != State::EMPTY) {
-                        return false;
-                    }
-
-                    if (isCellTouchingSomething(cellPos , State::BONUS, -1)) {
                         return false;
                     }
 
@@ -201,6 +193,61 @@ namespace Models {
                 }
             }
         }
+    }
+
+    std::vector<Position> Board::checkBonusAcquisition(Tile* tile, Position& pos, int playerId) {
+        std::vector<Position> acquiredBonuses;
+
+        for (int y = 1; y < height - 1; ++y) {
+            for (int x = 1; x < width - 1; ++x) {
+                if (grid[y][x].getState() == State::BONUS) {
+                    bool surroundedTop = grid[y-1][x].getState() == State::GRASS &&
+                                        grid[y-1][x].getPlayerId() == playerId;
+                    bool surroundedBottom = grid[y+1][x].getState() == State::GRASS &&
+                                           grid[y+1][x].getPlayerId() == playerId;
+                    bool surroundedLeft = grid[y][x-1].getState() == State::GRASS &&
+                                         grid[y][x-1].getPlayerId() == playerId;
+                    bool surroundedRight = grid[y][x+1].getState() == State::GRASS &&
+                                          grid[y][x+1].getPlayerId() == playerId;
+
+                    if (surroundedTop && surroundedBottom && surroundedLeft && surroundedRight) {
+                        acquiredBonuses.push_back(Position(x, y));
+                    }
+                }
+            }
+        }
+
+        return acquiredBonuses;
+    }
+
+    void Board::removeBonus(Position& pos) {
+        if (isInsideBoard(pos)) {
+            int x = pos.getX();
+            int y = pos.getY();
+            if (grid[y][x].getState() == State::BONUS) {
+                grid[y][x].setState(State::EMPTY);
+                grid[y][x].setBonusType(BonusType::NONE);
+            }
+        }
+    }
+
+    void Board::placeStone(Position& pos) {
+        if (isInsideBoard(pos) && !isTouchingWall(pos)) {
+            int x = pos.getX();
+            int y = pos.getY();
+            if (grid[y][x].getState() == State::EMPTY) {
+                grid[y][x].setState(State::BONUS);
+                grid[y][x].setBonusType(BonusType::STONE);
+            }
+        }
+    }
+
+    bool Board::hasStoneAt(Position& pos) const {
+        if (pos.getX() < 0 || pos.getX() >= width || pos.getY() < 0 || pos.getY() >= height) {
+            return false;
+        }
+        return grid[pos.getY()][pos.getX()].getState() == State::BONUS &&
+               grid[pos.getY()][pos.getX()].getBonusType() == BonusType::STONE;
     }
 
 }// Models

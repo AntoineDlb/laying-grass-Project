@@ -5,6 +5,7 @@
 #include "Tile.h"
 #include <vector>
 #include <iostream>
+#include <deque>
 
 #ifndef LAYING_GRASS_PROJECT_TILEQUEUE_H
 #define LAYING_GRASS_PROJECT_TILEQUEUE_H
@@ -12,20 +13,30 @@
 namespace Models {
     class TileQueue {
     private:
-        std::vector<Tile> tiles;
+        std::deque<Tile> tiles;
         std::vector<Tile> usedTiles;
+        int currentIndex;
     public:
         TileQueue();
 
-        std::vector<Tile> const getTiles(){ return tiles; }
+        std::deque<Tile>& getTiles() { return tiles; }
+        std::vector<Tile>& getUsedTiles() { return usedTiles; }
 
         void loadTiles();
+        void shuffleTiles();
         void addTile(Tile t);
         void addUsedTile(Tile t);
 
         void removeTile(Tile t);
         void removeUsedTile(Tile t);
 
+        Tile* getCurrentTile();
+        Tile* getTileAt(int index);
+        std::vector<Tile> getNextTiles(int count);
+
+        void selectTileFromMarket(int marketIndex);
+        void recycleTiles();
+        bool isEmpty() const;
     };
 } // Models
 

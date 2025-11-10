@@ -43,14 +43,20 @@ namespace Models {
         };
 
         void placeBonus();
+        void removeBonus(Position& pos);
+        void placeStone(Position& pos);
+        bool hasStoneAt(Position& pos) const;
 
         bool isCellTouchingSomething(Position& pos, State state, int playerId);
         bool isTileTouchingGrass(Tile* tile, Position& pos, int playerId);
         bool isTouchingWall(Position& pos);
         bool isInsideBoard(Position& pos);
 
-        bool canPlaceTile(Tile* tile, Position& pos, int playerId); // à placer dans game
-        void placeTile(Tile* tile, Position& pos, int playerId); // a placer dans game
+        bool canPlaceTile(Tile* tile, Position& pos, int playerId);
+        void placeTile(Tile* tile, Position& pos, int playerId);
+
+        std::vector<Position> checkBonusAcquisition(Tile* tile, Position& pos, int playerId);
+
     };
 }// Models
 

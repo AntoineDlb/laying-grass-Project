@@ -21,7 +21,7 @@ namespace Views {
         void displayWelcome();
         void displayBoard(Models::Board& board);
         void displayTile(Models::Tile& tile);
-        void displayMarket(std::vector<Models::Tile>& marketTiles);
+        int displayMarket(std::vector<Models::Tile>& marketTiles);
         void displayPlayer(Models::Player& player);
         void displayMessage(std::string& message);
         void displayBoardWithTile(Models::Board& board, Models::Tile& tile, Models::Position& pos, int playerId);

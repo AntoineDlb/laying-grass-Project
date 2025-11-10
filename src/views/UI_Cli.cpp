@@ -125,7 +125,7 @@ namespace Views {
                   << std::endl;
     }
 
-    void UI_Cli::displayMarket(std::vector<Models::Tile>& marketTiles) {
+    int UI_Cli::displayMarket(std::vector<Models::Tile>& marketTiles) {
         int selectedIndex = 0;
 
         while (true) {

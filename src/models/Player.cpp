@@ -14,7 +14,4 @@ namespace Models {
         exchange = 1;
         score = 0;
     }
-
-
-    }
 }

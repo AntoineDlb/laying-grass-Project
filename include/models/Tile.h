@@ -47,6 +47,7 @@ namespace Models {
         std::vector<std::vector<Cell>> getPattern(){return pattern;};
 
         void rotate();
+        void flipHorizontal();
         void setPattern(std::vector<std::vector<Cell>> p) { pattern = p; }
     };
 } // Models

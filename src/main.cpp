@@ -3,6 +3,7 @@
 #include <fstream>
 #include "models/Tile.h"
 #include "models/Board.h"
+#include  "utils/SquareCalculator.h"
 
 void displayBoard();
 void displayTile();

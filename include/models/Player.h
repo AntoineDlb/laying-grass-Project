@@ -37,7 +37,7 @@ namespace Models {
 
 
 
-        //destructer !!!!
+        //destructeur !!!!
     };
 } // Models
 #endif //LAYING_GRASS_PROJECT_PLAYER_H

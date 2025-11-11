@@ -43,7 +43,7 @@ namespace Models {
         };
 
         void placeBonus();
-        void removeBonus(Position& pos);
+        void removeBonus(Position& pos, int playerId);
         void placeStone(Position& pos);
         bool hasStoneAt(Position& pos) const;
 

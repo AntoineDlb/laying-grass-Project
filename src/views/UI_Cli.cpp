@@ -6,6 +6,7 @@
 #include "../../include/utils/KeyboardInput.h"
 #include "../../include/controllers/TilePlacer.h"
 #include <iostream>
+#include <limits>
 
 namespace Views {
 
@@ -179,8 +180,14 @@ namespace Views {
     int UI_Cli::askNumberOfPlayers() {
         int playerNumber = 0;
         while (playerNumber < 2 || playerNumber > 9) {
-            std::cout << "Enter number of players (2-9): ";
-            std::cin >> playerNumber;
+            std::cout << "Enter number of players (2-9):" << std::endl;
+            if (!(std::cin >> playerNumber)) {
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cout << "Invalid input. Please enter a number between 2 and 9." << std::endl;
+                playerNumber = 0;
+                continue;
+            }
             if (playerNumber < 2 || playerNumber > 9) {
                 std::cout << "Invalid number of players. Please enter a number between 2 and 9." << std::endl;
             }
@@ -189,9 +196,13 @@ namespace Views {
     }
 
     std::string UI_Cli::askPlayerName(std::string playerName) {
-        std::cout << "Enter name for " << playerName << ": ";
+        std::cout << "Enter name for " << playerName << ":" << std::endl;
         std::string name;
-        std::cin >> name;
+        while (!(std::cin >> name)) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Invalid input. Enter name for " << playerName << ":" << std::endl;
+        }
         return name;
     }
 
@@ -204,10 +215,15 @@ namespace Views {
                 std::cout << (i + 1) << ". " << availableColors[i] << std::endl;
             }
 
-            std::cout << "Choose a color (1-" << availableColors.size() << "): ";
-            std::cin >> choice;
-
-            if (choice < 1 || choice > availableColors.size()) {
+            std::cout << "Choose a color (1-" << availableColors.size() << "):" << std::endl;
+            if (!(std::cin >> choice)) {
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cout << "Invalid input. Please enter a number between 1 and " << availableColors.size() << "." << std::endl;
+                choice = -1;
+                continue;
+            }
+            if (choice < 1 || choice > static_cast<int>(availableColors.size())) {
                 std::cout << "Invalid choice. Please enter a number between 1 and " << availableColors.size() << "." << std::endl;
             }
         }

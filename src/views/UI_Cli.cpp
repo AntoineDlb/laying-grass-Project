@@ -6,6 +6,21 @@
 #include "../../include/utils/KeyboardInput.h"
 #include "../../include/controllers/TilePlacer.h"
 #include <iostream>
+#if defined(_WIN32) || defined(_WIN64)
+#include <windows.h>
+#endif
+
+#if defined(_WIN32) || defined(_WIN64)
+static constexpr WORD COL_BLACK = 0;
+static constexpr WORD COL_DARK_BLUE = 1;
+static constexpr WORD COL_DARK_RED = 4;
+static constexpr WORD COL_MAGENTA = 5;
+static constexpr WORD COL_BROWN = 6;
+static constexpr WORD COL_WHITE = 7;
+static constexpr WORD COL_LIGHT_BLUE = 9;
+static constexpr WORD COL_LIGHT_MAGENTA = 13;
+static constexpr WORD COL_LIGHT_YELLOW = 14;
+#endif
 
 namespace Views {
 
@@ -47,15 +62,61 @@ namespace Views {
         }
     }
 
-    void UI_Cli::displayBoard(Models::Board& board) {
+    static WORD mapColorStringToAttr(const std::string& color) {
+#if defined(_WIN32) || defined(_WIN64)
+
+    if (color == "white") return COL_WHITE;
+    if (color == "light_blue") return COL_LIGHT_BLUE;
+    if (color == "dark_blue") return COL_DARK_BLUE;
+    if (color == "yellow") return COL_LIGHT_YELLOW;
+    if (color == "red") return COL_DARK_RED;   
+    if (color == "purple") return COL_MAGENTA;
+    if (color == "pink") return COL_LIGHT_MAGENTA;
+    if (color == "brown") return COL_BROWN;
+    if (color == "black") return COL_BLACK;
+    return COL_WHITE;
+#else
+    (void)color;
+    return 0;
+#endif
+    }
+
+    void UI_Cli::displayBoard(Models::Board& board, std::vector<Models::Player>& players) {
 
         int width = board.getWidth();
         int height = board.getHeight();
 
+
+#if defined(_WIN32) || defined(_WIN64)
+        HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+        CONSOLE_SCREEN_BUFFER_INFO csbi;
+        WORD defaultAttr = 7;
+        if (GetConsoleScreenBufferInfo(hConsole, &csbi)) {
+            defaultAttr = csbi.wAttributes & (FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+        }
+#endif
+
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
                 Models::Cell cell = board.getGrid()[y][x];
+                if (cell.getState() == Models::State::GRASS) {
+                    int pid = cell.getPlayerId();
+#if defined(_WIN32) || defined(_WIN64)
+                    if (pid >= 0 && pid < static_cast<int>(players.size())) {
+                        WORD attr = mapColorStringToAttr(players[pid].getColor());
+                        SetConsoleTextAttribute(hConsole, attr);
+                    }
+#endif
+                }
+
                 std::cout << renderCell(cell);
+
+#if defined(_WIN32) || defined(_WIN64)
+                //reset color après affichage d'une cellule d'herbe
+                if (cell.getState() == Models::State::GRASS) {
+                    SetConsoleTextAttribute(hConsole, defaultAttr);
+                }
+#endif
             }
             std::cout << std::endl;
         }
@@ -74,7 +135,7 @@ namespace Views {
         }
     }
 
-    void UI_Cli::displayBoardWithTile(Models::Board& board, Models::Tile& tile, Models::Position& pos, int playerId) {
+    void UI_Cli::displayBoardWithTile(Models::Board& board, Models::Tile& tile, Models::Position& pos, int playerId, std::vector<Models::Player>& players) {
         int boardWidth = board.getWidth();
         int boardHeight = board.getHeight();
         int tileWidth = tile.getWidth();
@@ -98,6 +159,15 @@ namespace Views {
             }
         }
 
+#if defined(_WIN32) || defined(_WIN64)
+        HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+        CONSOLE_SCREEN_BUFFER_INFO csbi;
+        WORD defaultAttr = 7;
+        if (GetConsoleScreenBufferInfo(hConsole, &csbi)) {
+            defaultAttr = csbi.wAttributes & (FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+        }
+#endif
+
         for (int y = 0; y < boardHeight; ++y) {
             for (int x = 0; x < boardWidth; ++x) {
                 Models::Cell cell = tempGrid[y][x];
@@ -111,7 +181,24 @@ namespace Views {
                     }
                 }
 
+                //colorie la cellule si c'est de l'herbe en fonction de l'id du joueur
+                if (cell.getState() == Models::State::GRASS) {
+                    int pid = cell.getPlayerId();
+#if defined(_WIN32) || defined(_WIN64)
+                    if (pid >= 0 && pid < static_cast<int>(players.size())) {
+                        WORD attr = mapColorStringToAttr(players[pid].getColor());
+                        SetConsoleTextAttribute(hConsole, attr);
+                    }
+#endif
+                }
+
                 std::cout << renderCell(cell, isTempTile);
+
+#if defined(_WIN32) || defined(_WIN64)
+                if (cell.getState() == Models::State::GRASS) {
+                    SetConsoleTextAttribute(hConsole, defaultAttr);
+                }
+#endif
             }
             std::cout << std::endl;
         }
@@ -217,7 +304,7 @@ namespace Views {
         return selectedColor;
     }
 
-    void UI_Cli::tilePlacement(Models::Tile& tile, Models::Board& board, int playerId) {
+    void UI_Cli::tilePlacement(Models::Tile& tile, Models::Board& board, int playerId, std::vector<Models::Player>& players) {
 
         Controllers::TilePlacer placer(&tile, &board, playerId);
         bool placementConfirmed = false;
@@ -238,7 +325,7 @@ namespace Views {
             std::cout << "Position: (" << pos.getX() << ", " << pos.getY() << ")" << std::endl;
             std::cout << std::endl;
 
-            displayBoardWithTile(board, tile, pos, playerId);
+            displayBoardWithTile(board, tile, pos, playerId, players);
 
             std::cout << std::endl;
             std::cout << "Controls:" << std::endl;

@@ -19,19 +19,19 @@ namespace Views {
         //display
         void clearScreen();
         void displayWelcome();
-        void displayBoard(Models::Board& board);
+        void displayBoard(Models::Board& board, std::vector<Models::Player>& players);
         void displayTile(Models::Tile& tile);
         int displayMarket(std::vector<Models::Tile>& marketTiles);
         void displayPlayer(Models::Player& player);
         void displayMessage(std::string& message);
-        void displayBoardWithTile(Models::Board& board, Models::Tile& tile, Models::Position& pos, int playerId);
+        void displayBoardWithTile(Models::Board& board, Models::Tile& tile, Models::Position& pos, int playerId, std::vector<Models::Player>& players);
         void displayWinner(std::vector<Models::Player>& players, int winnerId);
 
         //inputs
         int askNumberOfPlayers();
         std::string askPlayerName(std::string playerName);
         std::string askPlayerColor(std::vector<std::string>& availableColors);
-        void tilePlacement(Models::Tile& tile, Models::Board& board, int playerId);
+        void tilePlacement(Models::Tile& tile, Models::Board& board, int playerId, std::vector<Models::Player>& players);
 
     private:
         std::string renderCell(Models::Cell& cell, bool isTempTile = false);

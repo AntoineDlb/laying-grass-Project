@@ -113,7 +113,7 @@ namespace Controllers {
             Models::Tile startTile(0, pattern);
             startTile.setPlayerId(player.getId());
 
-            ui->tilePlacement(startTile, *board, player.getId());
+            ui->tilePlacement(startTile, *board, player.getId(), players);
 
         }
     }
@@ -196,8 +196,8 @@ namespace Controllers {
         if (tile == nullptr || board == nullptr) {
             return false;
         }
-        ui->displayBoard(*board);
-        ui->tilePlacement(*tile, *board, player.getId());
+    ui->displayBoard(*board, players);
+    ui->tilePlacement(*tile, *board, player.getId(), players);
         return tile->isPlaced();
     }
 
@@ -251,7 +251,7 @@ namespace Controllers {
             std::cout << "Invalid player ID!" << std::endl;
             return;
         }
-        ui->displayBoard(*board);
+    ui->displayBoard(*board, players);
         std::cout << "Enter position of tile to steal (x y): ";
         int x, y;
         std::cin >> x >> y;
@@ -286,7 +286,7 @@ namespace Controllers {
 
                     Models::Tile purchasedTile(-1, pattern); // ID -1 for purchased tiles
                     purchasedTile.setPlayerId(player.getId());
-                    ui->tilePlacement(purchasedTile, *board, player.getId());
+                    ui->tilePlacement(purchasedTile, *board, player.getId(), players);
 
                     player.setExchange(player.getExchange() - 1);
                     std::cout << "1x1 tile purchased and placed!" << std::endl;

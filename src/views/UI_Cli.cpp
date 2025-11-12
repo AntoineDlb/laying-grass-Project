@@ -11,7 +11,7 @@
 #endif
 
 #if defined(_WIN32) || defined(_WIN64)
-static constexpr WORD COL_BLACK = 0;
+static constexpr WORD COL_GREEN = 2;
 static constexpr WORD COL_DARK_BLUE = 1;
 static constexpr WORD COL_DARK_RED = 4;
 static constexpr WORD COL_MAGENTA = 5;
@@ -75,7 +75,7 @@ namespace Views {
     if (color == "purple") return COL_MAGENTA;
     if (color == "pink") return COL_LIGHT_MAGENTA;
     if (color == "brown") return COL_BROWN;
-    if (color == "black") return COL_BLACK;
+    if (color == "green") return COL_GREEN;
     return COL_WHITE;
 #else
     (void)color;
@@ -299,8 +299,26 @@ namespace Views {
 
         while (choice < 1 || choice > availableColors.size()) {
             std::cout << "\nAvailable colors:" << std::endl;
+
+#if defined(_WIN32) || defined(_WIN64)
+            HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+            CONSOLE_SCREEN_BUFFER_INFO csbi;
+            WORD defaultAttr = 7;
+            if (GetConsoleScreenBufferInfo(hConsole, &csbi)) {
+                defaultAttr = csbi.wAttributes & (FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+            }
+#endif
+
             for (size_t i = 0; i < availableColors.size(); ++i) {
+#if defined(_WIN32) || defined(_WIN64)
+                WORD attr = mapColorStringToAttr(availableColors[i]);
+                SetConsoleTextAttribute(hConsole, attr);
+                std::cout << (i + 1) << ". " << availableColors[i];
+                SetConsoleTextAttribute(hConsole, defaultAttr);
+                std::cout << std::endl;
+#else
                 std::cout << (i + 1) << ". " << availableColors[i] << std::endl;
+#endif
             }
 
             std::cout << "Choose a color (1-" << availableColors.size() << "): ";

@@ -11,7 +11,7 @@
 namespace Utils {
     class InputValidator {
     private:
-        std::vector<std::string> colors = {"white", "light_blue", "dark_blue", "yellow", "red", "purple", "pink", "brown", "black" };
+        std::vector<std::string> colors = {"white", "light_blue", "dark_blue", "yellow", "red", "purple", "pink", "brown", "green" };
         std::vector<std::string> takenColors;
     public:
         static bool isValidNumberOfPlayers(int numPlayers);

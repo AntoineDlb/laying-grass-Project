@@ -31,9 +31,11 @@ namespace Views {
     }
 
     void UI_Cli::displayWelcome() {
+        std::cout << "                                     " << std::endl;
         std::cout << "=====================================" << std::endl;
         std::cout << "     Welcome to the Lying Grass      " << std::endl;
         std::cout << "=====================================" << std::endl;
+        std::cout << "                                     " << std::endl;
     }
 
     std::string UI_Cli::renderCell(Models::Cell& cell, bool isTempTile) {

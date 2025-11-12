@@ -23,6 +23,7 @@ namespace Controllers {
     void Game::start() {
 
         ui = new Views::UI_Cli();
+        ui->displayWelcome();
         initializePlayers();
         initializeBoard();
         initializeTileQueue();

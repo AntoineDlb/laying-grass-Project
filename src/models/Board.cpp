@@ -220,12 +220,13 @@ namespace Models {
         return acquiredBonuses;
     }
 
-    void Board::removeBonus(Position& pos) {
+    void Board::removeBonus(Position& pos, int playerId) {
         if (isInsideBoard(pos)) {
             int x = pos.getX();
             int y = pos.getY();
             if (grid[y][x].getState() == State::BONUS) {
-                grid[y][x].setState(State::EMPTY);
+                grid[y][x].setState(State::GRASS);
+                grid[y][x].setPlayerId(playerId);
                 grid[y][x].setBonusType(BonusType::NONE);
             }
         }

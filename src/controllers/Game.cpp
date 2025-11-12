@@ -164,7 +164,7 @@ namespace Controllers {
                 Models::Cell* bonusCell = board->getCell(bonusPos);
                 if (bonusCell != nullptr) {
                     Models::BonusType bonusType = bonusCell->getBonusType();
-                    board->removeBonus(bonusPos);
+                    board->removeBonus(bonusPos, player.getId());
 
                     switch (bonusType) {
                         case Models::BonusType::EXCHANGE:

@@ -39,7 +39,6 @@ namespace Controllers {
         }
 
         finalPurchasePhase();
-        end();
     }
 
     void Game::end() {
@@ -48,10 +47,9 @@ namespace Controllers {
         Models::Player* winner = determineWinner();
 
         if (winner != nullptr) {
-            std::cout << "=== WINNER ===" << std::endl;
-            std::cout << "Player: " << winner->getName() << " (ID: " << winner->getId() << ")" << std::endl;
-            std::cout << "Score: " << winner->getScore() << std::endl;
+            ui->displayWinner(players, winner->getId());
         }
+
     }
 
     void Game::initializePlayers() {

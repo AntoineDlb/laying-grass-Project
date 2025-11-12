@@ -11,7 +11,7 @@
 #endif
 
 #if defined(_WIN32) || defined(_WIN64)
-static constexpr WORD COL_BLACK = 0;
+static constexpr WORD COL_GREEN = 2;
 static constexpr WORD COL_DARK_BLUE = 1;
 static constexpr WORD COL_DARK_RED = 4;
 static constexpr WORD COL_MAGENTA = 5;
@@ -31,9 +31,11 @@ namespace Views {
     }
 
     void UI_Cli::displayWelcome() {
+        std::cout << "                                     " << std::endl;
         std::cout << "=====================================" << std::endl;
-        std::cout << "     Welcome to the Lying Grass      " << std::endl;
+        std::cout << "     Welcome to the Laying Grass      " << std::endl;
         std::cout << "=====================================" << std::endl;
+        std::cout << "                                     " << std::endl;
     }
 
     std::string UI_Cli::renderCell(Models::Cell& cell, bool isTempTile) {
@@ -73,7 +75,7 @@ namespace Views {
     if (color == "purple") return COL_MAGENTA;
     if (color == "pink") return COL_LIGHT_MAGENTA;
     if (color == "brown") return COL_BROWN;
-    if (color == "black") return COL_BLACK;
+    if (color == "green") return COL_GREEN;
     return COL_WHITE;
 #else
     (void)color;
@@ -266,28 +268,28 @@ namespace Views {
     int UI_Cli::askNumberOfPlayers() {
         int playerNumber = 0;
         while (playerNumber < 2 || playerNumber > 9) {
-            std::cout << "Enter number of players (2-9):" << std::endl;
+            std::cout << "Enter number of players (2-9): ";
             if (!(std::cin >> playerNumber)) {
                 std::cin.clear();
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                std::cout << "Invalid input. Please enter a number between 2 and 9." << std::endl;
+                std::cout << "Invalid input. Please enter a number between 2 and 9 : ";
                 playerNumber = 0;
                 continue;
             }
             if (playerNumber < 2 || playerNumber > 9) {
-                std::cout << "Invalid number of players. Please enter a number between 2 and 9." << std::endl;
+                std::cout << "Invalid number of players. Please enter a number between 2 and 9.";
             }
         }
         return playerNumber;
     }
 
     std::string UI_Cli::askPlayerName(std::string playerName) {
-        std::cout << "Enter name for " << playerName << ":" << std::endl;
+        std::cout << "Enter name for " << playerName << ": ";
         std::string name;
         while (!(std::cin >> name)) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Invalid input. Enter name for " << playerName << ":" << std::endl;
+            std::cout << "Invalid input. Enter name for " << playerName << ": ";
         }
         return name;
     }
@@ -297,20 +299,38 @@ namespace Views {
 
         while (choice < 1 || choice > availableColors.size()) {
             std::cout << "\nAvailable colors:" << std::endl;
+
+#if defined(_WIN32) || defined(_WIN64)
+            HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+            CONSOLE_SCREEN_BUFFER_INFO csbi;
+            WORD defaultAttr = 7;
+            if (GetConsoleScreenBufferInfo(hConsole, &csbi)) {
+                defaultAttr = csbi.wAttributes & (FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+            }
+#endif
+
             for (size_t i = 0; i < availableColors.size(); ++i) {
+#if defined(_WIN32) || defined(_WIN64)
+                WORD attr = mapColorStringToAttr(availableColors[i]);
+                SetConsoleTextAttribute(hConsole, attr);
+                std::cout << (i + 1) << ". " << availableColors[i];
+                SetConsoleTextAttribute(hConsole, defaultAttr);
+                std::cout << std::endl;
+#else
                 std::cout << (i + 1) << ". " << availableColors[i] << std::endl;
+#endif
             }
 
-            std::cout << "Choose a color (1-" << availableColors.size() << "):" << std::endl;
+            std::cout << "Choose a color (1-" << availableColors.size() << "): ";
             if (!(std::cin >> choice)) {
                 std::cin.clear();
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                std::cout << "Invalid input. Please enter a number between 1 and " << availableColors.size() << "." << std::endl;
+                std::cout << "Invalid input. Please enter a number between 1 and " << availableColors.size() << ": ";
                 choice = -1;
                 continue;
             }
             if (choice < 1 || choice > static_cast<int>(availableColors.size())) {
-                std::cout << "Invalid choice. Please enter a number between 1 and " << availableColors.size() << "." << std::endl;
+                std::cout << "Invalid choice. Please enter a number between 1 and " << availableColors.size() << ": ";
             }
         }
 

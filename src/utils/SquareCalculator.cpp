@@ -4,7 +4,6 @@
 
 #include "../../include/utils/SquareCalculator.h"
 #include "../../include/models/Board.h"
-#include "../../include/models/Cell.h"
 
 #include <algorithm>
 
@@ -38,49 +37,37 @@ namespace Utils {
 
     int SquareCalculator::calculateSquare(Models::Board& board, int playerID) {
         std::vector<std::vector<Models::Cell>> grid = board.getGrid();
+        if (grid.empty() || grid[0].empty()) return 0;
 
-        int height = grid.size();
-        int width = grid[0].size();
-        int score = 0;
+        int height = static_cast<int>(grid.size());
+        int width = static_cast<int>(grid[0].size());
 
-        for (int row = 0; row < height; row++) {
-            for (int col = 0; col < width; col++) {
-                Models::Cell cell = grid[row][col];
+        std::vector<std::vector<int>> dp(height, std::vector<int>(width, 0));
+        int maxSide = 0;
 
-                if (cell.getPlayerId() == playerID) {
-                    int maxSquareSize = 1;
-
-                    for (int size = 2; row + size <= height && col + size <= width; size++) {
-                        bool isSquare = true;
-
-                        for (int i = 0; i < size && isSquare; i++) {
-                            for (int j = 0; j < size && isSquare; j++) {
-                                if (grid[row + i][col + j].getPlayerId() != playerID) {
-                                    isSquare = false;
-                                }
-                            }
-                        }
-
-                        if (isSquare) {
-                            maxSquareSize = size;
-                        } else {
-                            break;
-                        }
+        for (int r = 0; r < height; ++r) {
+            for (int c = 0; c < width; ++c) {
+                if (grid[r][c].getPlayerId() == playerID) {
+                    if (r == 0 || c == 0) {
+                        dp[r][c] = 1;
+                    } else {
+                        dp[r][c] = 1 + std::min({dp[r-1][c], dp[r][c-1], dp[r-1][c-1]});
                     }
-
-                    score += maxSquareSize;
+                    if (dp[r][c] > maxSide) maxSide = dp[r][c];
+                } else {
+                    dp[r][c] = 0;
                 }
             }
         }
 
-        return score;
+        return maxSide;
     }
 
     int SquareCalculator::calculateGrass(Models::Board& board, int playerID) {
         std::vector<std::vector<Models::Cell>> grid = board.getGrid();
 
-        int height = grid.size();
-        int width = grid[0].size();
+        int height = static_cast<int>(grid.size());
+        int width = static_cast<int>(grid[0].size());
         int grassCount = 0;
 
         for (int row = 0; row < height; row++) {

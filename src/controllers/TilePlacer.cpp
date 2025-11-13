@@ -35,7 +35,7 @@ namespace Controllers {
     }
 
     void TilePlacer::moveDown() {
-        if (currentPos.getY() < board->getHeight() - 1) {
+        if (currentTile != nullptr && currentPos.getY() + currentTile->getHeight() < board->getHeight()) {
             currentPos.setY(currentPos.getY() + 1);
             updateValidity();
         }
@@ -49,7 +49,7 @@ namespace Controllers {
     }
 
     void TilePlacer::moveRight() {
-        if (currentPos.getX() < board->getWidth() - 1) {
+        if (currentTile != nullptr && currentPos.getX() + currentTile->getWidth() < board->getWidth()) {
             currentPos.setX(currentPos.getX() + 1);
             updateValidity();
         }

@@ -1,156 +1,79 @@
-Fichier: `docs/PLAYER.md`
+# Guide joueur — Laying Grass
 
+Ce document explique comment lancer et jouer à Laying Grass (interface CLI), avec les commandes principales et quelques conseils pratiques.
 
+## Avant de lancer
 
-Courte description : documentation joueur complète en français — instructions simples pour jouer depuis CLion (ou en lançant l'exécutable).
+1. Ouvrez le projet dans CLion ou compilez via CMake (voir `CMakeLists.txt`).
+2. Si vous jouez depuis CLion : dans *Run | Edit Configurations*, cochez *Emulate terminal in output console* pour que les saisies fonctionnent correctement.
+3. Vous pouvez aussi lancer l'exécutable depuis le dossier de build (ex. `cmake-build-debug/laying_grass_Project.exe` ou `build\laying_grass_Project.exe`).
 
+## Démarrage
 
+Au lancement, suivez les invites : nombre de joueurs, puis pour chaque joueur son nom et sa couleur.
 
-```markdown
+## Déroulement d'une partie
 
-\# Guide joueur — Laying Grass
+- Le jeu se déroule en rounds (par défaut 9) avec un ordre de jeu tiré au sort.
+- À chaque tour le joueur voit la tuile courante, peut la faire tourner/retourner, puis choisit où la poser ou utiliser un bonus.
 
+## Commandes (interface CLI)
 
+- Flèches directionnelles (← ↑ → ↓) : déplacer la tuile candidate sur le plateau
+- Espace : valider la pose courante
+- r : tourner la tuile sens horaire (right)
+- l : tourner la tuile sens antihoraire (left)
+- f : retourner la tuile (flip), si supporté
+- y / n : confirmer ou refuser certaines actions (marché, conversions)
+- c : annuler l'opération courante (si disponible)
+- q : quitter un menu (si proposé)
 
-\## Avant de lancer
+Exemples rapides :
+- Positionner la tuile puis valider : (←/→/↑/↓) pour déplacer → `Espace` pour confirmer
+- Tourner avant de valider : `r` → utiliser les flèches → `Espace`
 
-1\. Ouvrir le projet dans CLion.
+## Coordonnées
 
-2\. Dans la configuration d'exécution : `Run | Edit Configurations` → cocher \*\*Emulate terminal in output console\*\* pour que les saisies clavier fonctionnent depuis CLion.
+La plupart des placements de tuiles s'effectuent via les flèches et la touche `Espace` (pas de saisie `x y`).
+Certaines actions (par ex. `STONE`, `STEAL` ou conversions finales) demandent encore des coordonnées sous la forme `x y` ; dans ce cas les indices sont généralement 0-based (cases 0..N-1).
 
-3\. Vous pouvez aussi lancer directement `cmake-build-debug/laying\_grass\_Project.exe` depuis l'explorateur Windows.
+## Bonus (utilisation)
 
+- EXCHANGE : donne un coupon d'échange; répondez `y` pour ouvrir le marché et choisissez une tuile par son index.
+- STONE : place une pierre 1×1 — saisissez `x y` quand demandé.
+- STEAL : voler une case — saisissez l'ID du joueur cible puis `x y` de la case à voler.
 
+## Placement de tuiles
 
-\## Démarrage
+- L'interface affiche la tuile candidate avec son orientation courante.
+- Déplacez la tuile candidate sur la grille à l'aide des flèches directionnelles (← ↑ → ↓).
+- Utilisez `r` / `l` / `f` pour ajuster l'orientation de la tuile avant validation.
+- Appuyez sur `Espace` pour valider définitivement la pose ; si la pose est invalide, la tentative échoue et la tuile peut être perdue pour ce tour selon les règles.
 
-\- Au lancement, le jeu demande :
+Remarque : si une action particulière demande explicitement des coordonnées (ex. pierre 1×1 ou vol), saisissez `x y` lorsque l'invite l'exige.
 
-&nbsp; - le nombre de joueurs,
+## Phase d'achat finale
 
-&nbsp; - puis le nom et la couleur de chaque joueur.
+Après la fin des rounds, chaque coupon non utilisé peut être converti en tuile GRASS 1×1 et posée immédiatement en répondant `y` puis en fournissant `x y`.
 
-\- Suivre les invites affichées en console.
+## Condition de victoire
 
+Le gagnant est le joueur ayant le plus grand carré continu de cases à son identifiant (la valeur affichée correspond à la taille du côté du plus grand carré et au total des cases d'herbe).
 
+## Conseils & dépannage
 
-\## Déroulement général
+- Si les saisies n'apparaissent pas dans CLion : vérifiez *Emulate terminal in output console*.
+- Lisez toujours les invites : elles précisent les touches valides et le format attendu.
+- Utilisez les coupons avec parcimonie (marché vs achat final) et entraînez-vous sur une petite grille pour maîtriser les orientations.
 
-\- Le jeu se joue en rounds (par défaut 9).
+---
 
-\- L'ordre de jeu est tiré au sort au début.
+Si tu veux, je peux :
+- formater ce guide en sections imprimables, ajouter des captures d'écran ou une version en anglais,
+- ou générer un court tutoriel interactif (exemples pas à pas) dans `docs/TUTORIAL.md`.
 
-\- À chaque tour, le joueur courant :
-
-&nbsp; - voit la tuile actuelle,
-
-&nbsp; - peut la faire tourner/retourner,
-
-&nbsp; - choisit où la poser (ou utiliser un bonus / coupon).
-
-
-
-\## Contrôles / touches (CLI)
-
-\- Tourner la tuile :
-
-&nbsp; - `r` : tourner sens horaire (right).
-
-&nbsp; - `l` : tourner sens antihoraire (left).
-
-&nbsp; - `f` : retourner / flip (si supporté).
-
-\- Positionner la tuile :
-
-&nbsp; - Entrer les coordonnées sous la forme `x y` (ex : `3 2`) pour la case d'ancrage de la tuile.
-
-&nbsp; - Confirmer la pose si demandé par `y` / `n`.
-
-\- Annuler / revenir :
-
-&nbsp; - `c` : annuler la pose en cours (si disponible).
-
-&nbsp; - `q` : quitter un menu (si proposé).
-
-
-
-\## Exemples rapides d'entrée
 
 \- Tourner puis poser : `r` puis `3 2` puis `y`
-
-\- Poser sans tourner : `3 2` puis `y`
-
-
-
-\## Coordonnées / indexation
-
-\- Les indices sont généralement 0-based (cases 0..N-1). Si l'interface affiche des indices 1-based, suivre l'indication affichée à l'écran.
-
-\- Vérifier toujours les invites avant de saisir.
-
-
-
-\## Bonus (comportement et saisies)
-
-\- `EXCHANGE` : +1 coupon d'échange. Pour l'utiliser, répondre `y` quand proposé.
-
-\- `STONE` : place une pierre 1x1 — entrer `x y` quand demandé.
-
-\- `STEAL` : voler une case :
-
-&nbsp; - saisir l'ID du joueur cible,
-
-&nbsp; - puis `x y` de la case à voler.
-
-&nbsp; - Si la capture est valide la case passe sous votre contrôle.
-
-\- Coupons d'échange :
-
-&nbsp; - Si vous avez des coupons, vous pouvez ouvrir le marché (`y`) et choisir une tuile parmi les propositions en entrant son index (ex : `1`, `2`, ...).
-
-
-
-\## Placement de tuile
-
-\- L'interface affiche le plateau et la tuile candidate (orientation actuelle).
-
-\- Indiquer `x y` pour l'ancrage. Si la pose est invalide, la pose échoue et la tuile est perdue pour ce tour (selon règles du jeu).
-
-\- Certaines tuile(s) peuvent exiger une orientation particulière — utiliser `r`/`l`/`f` avant de valider.
-
-
-
-\## Phase d'achat finale
-
-\- Après la fin des rounds, chaque coupon non utilisé peut être converti en tuile 1x1 (GRASS) et posée immédiatement : répondre `y` / `n`, puis fournir `x y` pour la pose si `y`.
-
-
-
-\## Condition de victoire
-
-\- Le gagnant est le joueur ayant le plus grand carré continu de cases à son identifiant.
-
-&nbsp; - Le score affiché correspond à la taille du côté du plus grand carré (ex : un carré de 3×3 donne la valeur `3`) et au nombre total de cases d'herbe.
-
-\- Les égalités sont résolues selon les règles affichées en fin de partie (vérifier la sortie console).
-
-
-
-\## Conseils pratiques
-
-\- Si les saisies n'apparaissent pas dans CLion : vérifier `Emulate terminal in output console`.
-
-\- Lire attentivement chaque invite (les menus indiquent les touches valides).
-
-\- Utiliser les coupons au meilleur moment (marché vs achat final).
-
-\- Tester une pose sur une petite grille pour s'entraîner aux orientations et coordonnées.
-
-
-
-Fin.
-
-```
 
 
 

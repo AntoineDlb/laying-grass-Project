@@ -12,7 +12,7 @@
 
 namespace Controllers {
 
-    Game::Game() : board(nullptr), tileQueue(nullptr), ui(nullptr), currentRound(0), maxRounds(9) {
+    Game::Game() : board(nullptr), tileQueue(nullptr), ui(nullptr), currentRound(0), maxRounds(4) {
     }
 
     Game::~Game() {

@@ -13,6 +13,9 @@ namespace Utils {
             case 'R':
             case 'r':
                 return KeyCode::ROTATE;
+            case 'F':
+            case 'f':
+                return KeyCode::FLIP;
             case ' ':
                 return KeyCode::CONFIRM;
             default:

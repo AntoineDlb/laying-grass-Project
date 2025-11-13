@@ -388,6 +388,9 @@ namespace Views {
                 case Utils::KeyCode::ROTATE:
                     placer.rotateTile();
                     break;
+                case Utils::KeyCode::FLIP:
+                    placer.flipTile();
+                    break;
                 case Utils::KeyCode::CONFIRM:
                     if (placer.isValidPlacement()) {
                         placer.confirmPlacement();

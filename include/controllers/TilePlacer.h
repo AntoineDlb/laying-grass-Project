@@ -29,6 +29,7 @@ namespace Controllers {
         void moveRight();
 
         void rotateTile();
+        void flipTile();
 
         bool isValidPlacement() const { return placementValid; }
 

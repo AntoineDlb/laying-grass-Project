@@ -361,8 +361,15 @@ namespace Controllers {
             return nullptr;
         }
 
-        Models::Player* winner = &players[0];
+        if (board != nullptr) {
+            std::vector<Utils::PlayerResult> results = Utils::SquareCalculator::rankingPlayersByScore(*board);
+            if (!results.empty()) {
+                return getPlayerById(results[0].playerID);
+            }
+        }
 
+
+        Models::Player* winner = &players[0];
         for (auto& player : players) {
             if (player.getScore() > winner->getScore()) {
                 winner = &player;

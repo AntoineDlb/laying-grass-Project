@@ -22,7 +22,6 @@ Au lancement, suivez les invites : nombre de joueurs, puis pour chaque joueur so
 - Flèches directionnelles (← ↑ → ↓) : déplacer la tuile candidate sur le plateau
 - Espace : valider la pose courante
 - r : tourner la tuile sens horaire (right)
-- l : tourner la tuile sens antihoraire (left)
 - f : retourner la tuile (flip), si supporté
 - y / n : confirmer ou refuser certaines actions (marché, conversions)
 - c : annuler l'opération courante (si disponible)
@@ -67,13 +66,6 @@ Le gagnant est le joueur ayant le plus grand carré continu de cases à son iden
 - Utilisez les coupons avec parcimonie (marché vs achat final) et entraînez-vous sur une petite grille pour maîtriser les orientations.
 
 ---
-
-Si tu veux, je peux :
-- formater ce guide en sections imprimables, ajouter des captures d'écran ou une version en anglais,
-- ou générer un court tutoriel interactif (exemples pas à pas) dans `docs/TUTORIAL.md`.
-
-
-\- Tourner puis poser : `r` puis `3 2` puis `y`
 
 
 

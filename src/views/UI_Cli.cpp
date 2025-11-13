@@ -421,9 +421,30 @@ namespace Views {
             else std::cout << "Select owned tile to steal (SPACE to confirm)." << std::endl;
             std::cout << "Cursor: (" << cursor.getX() << ", " << cursor.getY() << ")" << std::endl << std::endl;
 
+            //garde la couleur pendant le displayboard
+#if defined(_WIN32) || defined(_WIN64)
+            HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+            CONSOLE_SCREEN_BUFFER_INFO csbi;
+            WORD defaultAttr = 7;
+            if (GetConsoleScreenBufferInfo(hConsole, &csbi)) {
+                defaultAttr = csbi.wAttributes & (FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+            }
+#endif
+
             for (int y = 0; y < height; ++y) {
                 for (int x = 0; x < width; ++x) {
                     Models::Cell cell = board.getGrid()[y][x];
+
+                    if (cell.getState() == Models::State::GRASS) {
+#if defined(_WIN32) || defined(_WIN64)
+                        int pid = cell.getPlayerId();
+                        if (pid >= 0 && pid < static_cast<int>(players.size())) {
+                            WORD attr = mapColorStringToAttr(players[pid].getColor());
+                            SetConsoleTextAttribute(hConsole, attr);
+                        }
+#endif
+                    }
+
                     if (x == cursor.getX() && y == cursor.getY()) {
                         if (mode == 1) {
                             if (cell.getState() == Models::State::GRASS && cell.getPlayerId() == ownerId) std::cout << "[S]";
@@ -434,6 +455,12 @@ namespace Views {
                         }
                     } else {
                         std::cout << renderCell(cell);
+                    }
+                    
+                    if (cell.getState() == Models::State::GRASS) {
+#if defined(_WIN32) || defined(_WIN64)
+                        SetConsoleTextAttribute(hConsole, defaultAttr);
+#endif
                     }
                 }
                 std::cout << std::endl;

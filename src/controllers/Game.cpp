@@ -209,39 +209,12 @@ namespace Controllers {
 
     void Game::applyStoneBonus(Models::Player& player) {
         std::cout << "Player " << player.getName() << " can place a stone tile!" << std::endl;
-        int x, y;
-        while (true) {
-            std::cout << "Enter stone position (x y): "<<std::endl;
-            ui->displayBoard(*board, players);
-            if (!(std::cin >> x >> y)) {
-                std::cin.clear();
-                std::string bad;
-                std::getline(std::cin, bad);
-                std::cout << "Invalid input. Please enter two integers separated by a space." << std::endl;
-                continue;
-            }
-
-            Models::Position stonePos(x, y);
-
-            if (!board->isInsideBoard(stonePos)) {
-                std::cout << "Position outside the board. Try again." << std::endl;
-                continue;
-            }
-
-            Models::Cell* cell = board->getCell(stonePos);
-            if (cell == nullptr || cell->getState() != Models::State::EMPTY) {
-                std::cout << "Cell is not empty. Try again." << std::endl;
-                continue;
-            }
-
-            if (board->isTouchingWall(stonePos)) {
-                std::cout << "Placement not allowed: too close to the wall. Try again." << std::endl;
-                continue;
-            }
-
+        Models::Position stonePos = ui->selectPosition(*board, players, 0);
+        if (board->isInsideBoard(stonePos)) {
             board->placeStone(stonePos);
-            std::cout << "Stone placed at (" << x << ", " << y << ")!" << std::endl;
-            break;
+            std::cout << "Stone placed at (" << stonePos.getX() << ", " << stonePos.getY() << ")!" << std::endl;
+        } else {
+            std::cout << "Selected position is outside the board. Stone not placed." << std::endl;
         }
     }
 
@@ -253,7 +226,6 @@ namespace Controllers {
                 std::cout << "  Player " << p.getId() << ": " << p.getName() << std::endl;
             }
         }
-
         std::cout << "Choose player ID to steal from: ";
         int targetPlayerId;
         if (!(std::cin >> targetPlayerId)) {
@@ -275,40 +247,25 @@ namespace Controllers {
             return;
         }
 
-
-        int x, y;
-        while (true) {
-            std::cout << "Enter position of tile to steal (x y): "<<std::endl;
-            ui->displayBoard(*board, players);
-            if (!(std::cin >> x >> y)) {
-                std::cin.clear();
-                std::string bad;
-                std::getline(std::cin, bad);
-                std::cout << "Invalid input. Please enter two integers separated by a space." << std::endl;
-                continue;
-            }
-
-            Models::Position targetPos(x, y);
-            if (!board->isInsideBoard(targetPos)) {
-                std::cout << "Position outside the board. Try again." << std::endl;
-                continue;
-            }
-
-            Models::Cell* cell = board->getCell(targetPos);
-            if (cell == nullptr) {
-                std::cout << "Invalid cell. Try again." << std::endl;
-                continue;
-            }
-
-            if (cell->getState() != Models::State::GRASS || cell->getPlayerId() != targetPlayerId) {
-                std::cout << "That tile is not owned by the chosen player. Try again." << std::endl;
-                continue;
-            }
-
-            cell->setPlayerId(player.getId());
-            std::cout << "Tile stolen successfully!" << std::endl;
-            break;
+        Models::Position targetPos = ui->selectPosition(*board, players, 1, targetPlayerId);
+        if (!board->isInsideBoard(targetPos)) {
+            std::cout << "Selected position is outside the board. Steal aborted." << std::endl;
+            return;
         }
+
+        Models::Cell* cell = board->getCell(targetPos);
+        if (cell == nullptr) {
+            std::cout << "Invalid cell. Steal aborted." << std::endl;
+            return;
+        }
+
+        if (cell->getState() != Models::State::GRASS || cell->getPlayerId() != targetPlayerId) {
+            std::cout << "That tile is not owned by the chosen player. Steal aborted." << std::endl;
+            return;
+        }
+
+        cell->setPlayerId(player.getId());
+        std::cout << "Tile stolen successfully!" << std::endl;
     }
     
     void Game::finalPurchasePhase() {
@@ -379,7 +336,6 @@ namespace Controllers {
         return winner;
     }
 
-    // Utility methods
     bool Game::isGameOver() const {
         return currentRound >= maxRounds;
     }

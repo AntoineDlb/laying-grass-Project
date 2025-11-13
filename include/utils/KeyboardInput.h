@@ -14,6 +14,7 @@ namespace Utils {
         LEFT,
         RIGHT,
         ROTATE,
+        FLIP,
         CONFIRM,
         UNKNOWN
     };

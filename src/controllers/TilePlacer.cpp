@@ -61,6 +61,11 @@ namespace Controllers {
             updateValidity();
         }
     }
+    void TilePlacer::flipTile() {
+        if (currentTile != nullptr) {
+            currentTile->flipHorizontal();
+        }
+    }
 
     bool TilePlacer::confirmPlacement() {
         if (!placementValid) {

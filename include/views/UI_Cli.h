@@ -32,6 +32,7 @@ namespace Views {
         std::string askPlayerName(std::string playerName);
         std::string askPlayerColor(std::vector<std::string>& availableColors);
         void tilePlacement(Models::Tile& tile, Models::Board& board, int playerId, std::vector<Models::Player>& players);
+        Models::Position selectPosition(Models::Board& board, std::vector<Models::Player>& players, int mode, int ownerId = -1);
 
     private:
         std::string renderCell(Models::Cell& cell, bool isTempTile = false);

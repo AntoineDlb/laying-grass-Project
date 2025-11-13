@@ -409,4 +409,56 @@ namespace Views {
             }
         }
     }
+
+    Models::Position UI_Cli::selectPosition(Models::Board& board, std::vector<Models::Player>& players, int mode, int ownerId) {
+        int width = board.getWidth();
+        int height = board.getHeight();
+        Models::Position cursor(width / 2, height / 2);
+
+        while (true) {
+            clearScreen();
+            if (mode == 0) std::cout << "Select empty cell (SPACE to confirm)." << std::endl;
+            else std::cout << "Select owned tile to steal (SPACE to confirm)." << std::endl;
+            std::cout << "Cursor: (" << cursor.getX() << ", " << cursor.getY() << ")" << std::endl << std::endl;
+
+            for (int y = 0; y < height; ++y) {
+                for (int x = 0; x < width; ++x) {
+                    Models::Cell cell = board.getGrid()[y][x];
+                    if (x == cursor.getX() && y == cursor.getY()) {
+                        if (mode == 1) {
+                            if (cell.getState() == Models::State::GRASS && cell.getPlayerId() == ownerId) std::cout << "[S]";
+                            else std::cout << "[ ]";
+                        } else {
+                            if (cell.getState() == Models::State::EMPTY) std::cout << "[ ]";
+                            else std::cout << "[X]";
+                        }
+                    } else {
+                        std::cout << renderCell(cell);
+                    }
+                }
+                std::cout << std::endl;
+            }
+
+            Utils::KeyCode key = Utils::KeyboardInput::getKeyPressed();
+            switch (key) {
+                case Utils::KeyCode::UP:    if (cursor.getY() > 0) cursor.setY(cursor.getY() - 1); break;
+                case Utils::KeyCode::DOWN:  if (cursor.getY() < height - 1) cursor.setY(cursor.getY() + 1); break;
+                case Utils::KeyCode::LEFT:  if (cursor.getX() > 0) cursor.setX(cursor.getX() - 1); break;
+                case Utils::KeyCode::RIGHT: if (cursor.getX() < width - 1) cursor.setX(cursor.getX() + 1); break;
+                case Utils::KeyCode::CONFIRM: {
+                    Models::Cell* c = board.getCell(cursor);
+                    if (c == nullptr) { std::cout << "Invalid cell. Try again." << std::endl; continue; }
+                    if (mode == 0) {
+                        if (c->getState() != Models::State::EMPTY) { std::cout << "Cell not empty. Try again." << std::endl; continue; }
+                        if (board.isTouchingWall(cursor)) { std::cout << "Too close to wall. Try again." << std::endl; continue; }
+                        return cursor;
+                    } else {
+                        if (c->getState() != Models::State::GRASS || c->getPlayerId() != ownerId) { std::cout << "Not owned by that player. Try again." << std::endl; continue; }
+                        return cursor;
+                    }
+                }
+                default: break;
+            }
+        }
+    }
 } // Views

@@ -7,6 +7,9 @@
 
 namespace Utils {
     class Random {
+    public:
+        static int getInt(int min, int max);
+        static int shuffle();
     };
 } // Utils
 

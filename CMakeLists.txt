@@ -3,31 +3,50 @@ project(laying_grass_Project)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(laying_grass_Project src/main.cpp
+if(MINGW)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++ -static")
+endif()
+
+include(FetchContent)
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
+FetchContent_MakeAvailable(json)
+
+set(COMMON_SOURCES
         src/models/Cell.cpp
-        include/models/Cell.h
         src/models/Player.cpp
-        include/models/Player.h
         src/models/Board.cpp
-        include/models/Board.h
         src/models/Tile.cpp
-        include/models/Tile.h
         src/models/TileQueue.cpp
-        include/models/TileQueue.h
         src/models/BonusSquare.cpp
-        include/models/BonusSquare.h
         src/models/Position.cpp
-        include/models/Position.h
         src/controllers/Game.cpp
-        include/controllers/Game.h
-        src/views/Renderer.cpp
-        include/views/Renderer.h
+        src/controllers/TilePlacer.cpp
         src/utils/SquareCalculator.cpp
-        include/utils/SquareCalculator.h
         src/utils/InputValidator.cpp
-        include/utils/InputValidator.h
         src/utils/Random.cpp
-        include/utils/Random.h
-        tests/test_tile.cpp
-        tests/test_board.cpp
-        tests/test_square_calculator.cpp)
+        src/utils/KeyboardInput.cpp
+        src/views/UI_Cli.cpp
+        src/views/UI_Qt.cpp
+)
+
+add_executable(laying_grass_Project src/main.cpp
+       ${COMMON_SOURCES})
+
+configure_file(${CMAKE_SOURCE_DIR}/asserts/Tiles.json
+        ${CMAKE_BINARY_DIR}/Tiles.json COPYONLY)
+
+target_include_directories(laying_grass_Project PRIVATE include)
+
+target_link_libraries(laying_grass_Project PRIVATE nlohmann_json::nlohmann_json)
+
+file(GLOB TEST_FILES "tests/test_*.cpp")
+
+if(TEST_FILES)
+    add_executable(tests
+            ${TEST_FILES}
+            ${COMMON_SOURCES})
+    target_include_directories(tests PRIVATE include)
+
+    enable_testing()
+    add_test(NAME all_tests COMMAND tests)
+endif()

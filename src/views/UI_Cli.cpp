@@ -1,0 +1,409 @@
+//
+// Created by antoi on 03/11/2025.
+//
+
+#include "../../include/views/UI_Cli.h"
+#include "../../include/utils/KeyboardInput.h"
+#include "../../include/controllers/TilePlacer.h"
+#include <iostream>
+#if defined(_WIN32) || defined(_WIN64)
+#include <windows.h>
+#endif
+
+#if defined(_WIN32) || defined(_WIN64)
+static constexpr WORD COL_GREEN = 2;
+static constexpr WORD COL_DARK_BLUE = 1;
+static constexpr WORD COL_DARK_RED = 4;
+static constexpr WORD COL_MAGENTA = 5;
+static constexpr WORD COL_BROWN = 6;
+static constexpr WORD COL_WHITE = 7;
+static constexpr WORD COL_LIGHT_BLUE = 9;
+static constexpr WORD COL_LIGHT_MAGENTA = 13;
+static constexpr WORD COL_LIGHT_YELLOW = 14;
+#endif
+
+namespace Views {
+
+    // display
+    void UI_Cli::clearScreen() {
+        std::cout << "\033[H\033[J";
+        std::cout << std::endl;
+    }
+
+    void UI_Cli::displayWelcome() {
+        std::cout << "                                     " << std::endl;
+        std::cout << "=====================================" << std::endl;
+        std::cout << "     Welcome to the Laying Grass      " << std::endl;
+        std::cout << "=====================================" << std::endl;
+        std::cout << "                                     " << std::endl;
+    }
+
+    std::string UI_Cli::renderCell(Models::Cell& cell, bool isTempTile) {
+        switch (cell.getState()) {
+            case Models::State::EMPTY:
+                return " . ";
+            case Models::State::GRASS:
+                if (isTempTile) {
+                    return "[#]";
+                } else {
+                    return " # ";
+                }
+            case Models::State::BONUS:
+                switch (cell.getBonusType()) {
+                    case Models::BonusType::EXCHANGE:
+                        return " E ";
+                    case Models::BonusType::STONE:
+                        return " S ";
+                    case Models::BonusType::STEAL:
+                        return " V ";
+                    default:
+                        return " B ";
+                }
+            default:
+                return " ? ";
+        }
+    }
+
+    static WORD mapColorStringToAttr(const std::string& color) {
+#if defined(_WIN32) || defined(_WIN64)
+
+    if (color == "white") return COL_WHITE;
+    if (color == "light_blue") return COL_LIGHT_BLUE;
+    if (color == "dark_blue") return COL_DARK_BLUE;
+    if (color == "yellow") return COL_LIGHT_YELLOW;
+    if (color == "red") return COL_DARK_RED;   
+    if (color == "purple") return COL_MAGENTA;
+    if (color == "pink") return COL_LIGHT_MAGENTA;
+    if (color == "brown") return COL_BROWN;
+    if (color == "green") return COL_GREEN;
+    return COL_WHITE;
+#else
+    (void)color;
+    return 0;
+#endif
+    }
+
+    void UI_Cli::displayBoard(Models::Board& board, std::vector<Models::Player>& players) {
+
+        int width = board.getWidth();
+        int height = board.getHeight();
+
+
+#if defined(_WIN32) || defined(_WIN64)
+        HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+        CONSOLE_SCREEN_BUFFER_INFO csbi;
+        WORD defaultAttr = 7;
+        if (GetConsoleScreenBufferInfo(hConsole, &csbi)) {
+            defaultAttr = csbi.wAttributes & (FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+        }
+#endif
+
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width; ++x) {
+                Models::Cell cell = board.getGrid()[y][x];
+                if (cell.getState() == Models::State::GRASS) {
+                    int pid = cell.getPlayerId();
+#if defined(_WIN32) || defined(_WIN64)
+                    if (pid >= 0 && pid < static_cast<int>(players.size())) {
+                        WORD attr = mapColorStringToAttr(players[pid].getColor());
+                        SetConsoleTextAttribute(hConsole, attr);
+                    }
+#endif
+                }
+
+                std::cout << renderCell(cell);
+
+#if defined(_WIN32) || defined(_WIN64)
+                //reset color après affichage d'une cellule d'herbe
+                if (cell.getState() == Models::State::GRASS) {
+                    SetConsoleTextAttribute(hConsole, defaultAttr);
+                }
+#endif
+            }
+            std::cout << std::endl;
+        }
+    }
+
+    void UI_Cli::displayTile(Models::Tile& tile) {
+        int height = tile.getHeight();
+        int width = tile.getWidth();
+
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width; ++x) {
+                Models::Cell cell = tile.getPattern()[y][x];
+                std::cout << renderCell(cell);
+            }
+            std::cout << std::endl;
+        }
+    }
+
+    void UI_Cli::displayBoardWithTile(Models::Board& board, Models::Tile& tile, Models::Position& pos, int playerId, std::vector<Models::Player>& players) {
+        int boardWidth = board.getWidth();
+        int boardHeight = board.getHeight();
+        int tileWidth = tile.getWidth();
+        int tileHeight = tile.getHeight();
+        int tileX = pos.getX();
+        int tileY = pos.getY();
+
+        std::vector<std::vector<Models::Cell>> tempGrid = board.getGrid();
+
+        for (int ty = 0; ty < tileHeight; ++ty) {
+            for (int tx = 0; tx < tileWidth; ++tx) {
+                int boardX = tileX + tx;
+                int boardY = tileY + ty;
+
+                if (boardX >= 0 && boardX < boardWidth && boardY >= 0 && boardY < boardHeight) {
+                    if (tile.getPattern()[ty][tx].getState() == Models::State::GRASS) {
+                        tempGrid[boardY][boardX] = tile.getPattern()[ty][tx];
+                        tempGrid[boardY][boardX].setPlayerId(playerId);
+                    }
+                }
+            }
+        }
+
+#if defined(_WIN32) || defined(_WIN64)
+        HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+        CONSOLE_SCREEN_BUFFER_INFO csbi;
+        WORD defaultAttr = 7;
+        if (GetConsoleScreenBufferInfo(hConsole, &csbi)) {
+            defaultAttr = csbi.wAttributes & (FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+        }
+#endif
+
+        for (int y = 0; y < boardHeight; ++y) {
+            for (int x = 0; x < boardWidth; ++x) {
+                Models::Cell cell = tempGrid[y][x];
+
+                bool isTempTile = false;
+                if (x >= tileX && x < tileX + tileWidth && y >= tileY && y < tileY + tileHeight) {
+                    int tx = x - tileX;
+                    int ty = y - tileY;
+                    if (tile.getPattern()[ty][tx].getState() == Models::State::GRASS) {
+                        isTempTile = true;
+                    }
+                }
+
+                //colorie la cellule si c'est de l'herbe en fonction de l'id du joueur
+                if (cell.getState() == Models::State::GRASS) {
+                    int pid = cell.getPlayerId();
+#if defined(_WIN32) || defined(_WIN64)
+                    if (pid >= 0 && pid < static_cast<int>(players.size())) {
+                        WORD attr = mapColorStringToAttr(players[pid].getColor());
+                        SetConsoleTextAttribute(hConsole, attr);
+                    }
+#endif
+                }
+
+                std::cout << renderCell(cell, isTempTile);
+
+#if defined(_WIN32) || defined(_WIN64)
+                if (cell.getState() == Models::State::GRASS) {
+                    SetConsoleTextAttribute(hConsole, defaultAttr);
+                }
+#endif
+            }
+            std::cout << std::endl;
+        }
+    }
+
+    void UI_Cli::displayPlayer(Models::Player& player) {
+        std::cout << "Player " << player.getId() << ": " << player.getName()
+                  << " | Color: " << player.getColor()
+                  << " | Score: " << player.getScore()
+                  << " | Exchanges: " << player.getExchange()
+                  << std::endl;
+    }
+
+    int UI_Cli::displayMarket(std::vector<Models::Tile>& marketTiles) {
+        int selectedIndex = 0;
+
+        while (true) {
+            clearScreen();
+            std::cout << "=== TILE MARKET ===" << std::endl;
+            std::cout << "Choose a tile (UP/DOWN to navigate, SPACE to select)" << std::endl;
+            std::cout << std::endl;
+
+            for (size_t i = 0; i < marketTiles.size(); ++i) {
+                if (i == selectedIndex) {
+                    std::cout << ">>> [" << (i + 1) << "]" << std::endl;
+                } else {
+                    std::cout << "    [" << (i + 1) << "]" << std::endl;
+                }
+                displayTile(marketTiles[i]);
+                std::cout << std::endl;
+            }
+
+            Utils::KeyCode key = Utils::KeyboardInput::getKeyPressed();
+
+            switch (key) {
+                case Utils::KeyCode::UP:
+                    if (selectedIndex > 0) selectedIndex--;
+                    break;
+                case Utils::KeyCode::DOWN:
+                    if (selectedIndex < marketTiles.size() - 1) selectedIndex++;
+                    break;
+                case Utils::KeyCode::CONFIRM:
+                    return selectedIndex;
+                default:
+                    break;
+            }
+        }
+    }
+
+
+    void UI_Cli::displayMessage(std::string& message) {
+        std::cout << message << std::endl;
+    }
+
+    void UI_Cli::displayWinner(std::vector<Models::Player>& players, int winnerId) {
+        for (auto& player : players) {
+            if (player.getId() == winnerId) {
+                std::cout << "Congratulations " << player.getName() << "! You are the winner with a score of " << player.getScore() << "!" << std::endl;
+                return;
+            }
+        }
+    }
+
+    //inputs
+    int UI_Cli::askNumberOfPlayers() {
+        int playerNumber = 0;
+        while (playerNumber < 2 || playerNumber > 9) {
+            std::cout << "Enter number of players (2-9): ";
+            if (!(std::cin >> playerNumber)) {
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cout << "Invalid input. Please enter a number between 2 and 9 : ";
+                playerNumber = 0;
+                continue;
+            }
+            if (playerNumber < 2 || playerNumber > 9) {
+                std::cout << "Invalid number of players. Please enter a number between 2 and 9.";
+            }
+        }
+        return playerNumber;
+    }
+
+    std::string UI_Cli::askPlayerName(std::string playerName) {
+        std::cout << "Enter name for " << playerName << ": ";
+        std::string name;
+        while (!(std::cin >> name)) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Invalid input. Enter name for " << playerName << ": ";
+        }
+        return name;
+    }
+
+    std::string UI_Cli::askPlayerColor(std::vector<std::string>& availableColors) {
+        int choice = -1;
+
+        while (choice < 1 || choice > availableColors.size()) {
+            std::cout << "\nAvailable colors:" << std::endl;
+
+#if defined(_WIN32) || defined(_WIN64)
+            HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+            CONSOLE_SCREEN_BUFFER_INFO csbi;
+            WORD defaultAttr = 7;
+            if (GetConsoleScreenBufferInfo(hConsole, &csbi)) {
+                defaultAttr = csbi.wAttributes & (FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+            }
+#endif
+
+            for (size_t i = 0; i < availableColors.size(); ++i) {
+#if defined(_WIN32) || defined(_WIN64)
+                WORD attr = mapColorStringToAttr(availableColors[i]);
+                SetConsoleTextAttribute(hConsole, attr);
+                std::cout << (i + 1) << ". " << availableColors[i];
+                SetConsoleTextAttribute(hConsole, defaultAttr);
+                std::cout << std::endl;
+#else
+                std::cout << (i + 1) << ". " << availableColors[i] << std::endl;
+#endif
+            }
+
+            std::cout << "Choose a color (1-" << availableColors.size() << "): ";
+            if (!(std::cin >> choice)) {
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cout << "Invalid input. Please enter a number between 1 and " << availableColors.size() << ": ";
+                choice = -1;
+                continue;
+            }
+            if (choice < 1 || choice > static_cast<int>(availableColors.size())) {
+                std::cout << "Invalid choice. Please enter a number between 1 and " << availableColors.size() << ": ";
+            }
+        }
+
+        std::string selectedColor = availableColors[choice - 1];
+        availableColors.erase(availableColors.begin() + choice - 1);
+        return selectedColor;
+    }
+
+    void UI_Cli::tilePlacement(Models::Tile& tile, Models::Board& board, int playerId, std::vector<Models::Player>& players) {
+
+        Controllers::TilePlacer placer(&tile, &board, playerId);
+        bool placementConfirmed = false;
+
+        while (!placementConfirmed) {
+            clearScreen();
+            std::cout << std::endl;
+
+            Models::Position pos = placer.getPosition();
+            bool isValid = placer.isValidPlacement();
+
+            // Display status
+            if (isValid) {
+                std::cout << "=== PLACEMENT VALID ===" << std::endl;
+            } else {
+                std::cout << "=== PLACEMENT INVALID ===" << std::endl;
+            }
+            std::cout << "Position: (" << pos.getX() << ", " << pos.getY() << ")" << std::endl;
+            std::cout << std::endl;
+
+            displayBoardWithTile(board, tile, pos, playerId, players);
+
+            std::cout << std::endl;
+            std::cout << "Controls:" << std::endl;
+            std::cout << "  Arrow Keys: Move tile" << std::endl;
+            std::cout << "  R: Rotate" << std::endl;
+            std::cout << "  SPACE: Confirm" << std::endl;
+            std::cout << std::endl;
+            std::cout << "Press a key..." << std::endl;
+
+            Utils::KeyCode key = Utils::KeyboardInput::getKeyPressed();
+
+            switch (key) {
+                case Utils::KeyCode::UP:
+                    placer.moveUp();
+                    break;
+                case Utils::KeyCode::DOWN:
+                    placer.moveDown();
+                    break;
+                case Utils::KeyCode::LEFT:
+                    placer.moveLeft();
+                    break;
+                case Utils::KeyCode::RIGHT:
+                    placer.moveRight();
+                    break;
+                case Utils::KeyCode::ROTATE:
+                    placer.rotateTile();
+                    break;
+                case Utils::KeyCode::CONFIRM:
+                    if (placer.isValidPlacement()) {
+                        placer.confirmPlacement();
+                        placementConfirmed = true;
+                        clearScreen();
+                        std::cout << "Tile placed successfully!" << std::endl;
+                    } else {
+                        clearScreen();
+                        std::cout << "[ERROR] Cannot place tile at this position!" << std::endl;
+                        std::cout << "Press any key to continue..." << std::endl;
+                        _getch();
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+} // Views
